@@ -52,10 +52,10 @@ jobs:
           POSTGRES_DB: test
         ports: [5432, 5432]
         options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
+          --health-cmd="pg_isready -U postgres -d test"
+          --health-interval=5s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
       redis:
         image: redis:7-alpine
         ports: [6379, 6379]
@@ -78,6 +78,17 @@ jobs:
 
       - name: Generate Prisma Client
         run: npm run prisma:generate
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U postgres -d test; then
+              echo "PostgreSQL is ready"
+              break
+            fi
+            echo "Waiting for PostgreSQL... ($i/30)"
+            sleep 2
+          done
 
       - name: Run migrations
         run: npx prisma migrate deploy
