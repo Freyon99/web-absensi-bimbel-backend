@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pengguna {
+  id            String        @id @default(uuid())
+  nama          String
+  email         String        @unique
+  password      String
+  peran         Peran
+  noHp          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  daftarAbsensi Absensi[]
+  logAbsenGuru  AbsensiGuru[]
+  daftarMurid   Murid[]
+}
+
+model Murid {
+  id               String    @id @default(uuid())
+  tanggalMasuk     DateTime  @default(now())
+  namaLengkap      String
+  namaPanggilan    String
+  kelas            Kelas
+  sekolahAsal      String
+  namaOrangTuaWali String
+  pekerjaanAyah    String
+  pekerjaanIbu     String
+  alamatDomisili   String
+  noHpOrangTua     String
+  hari             String
+  pembayaran       String
+  mapel            String
+  catatanAnak      String?
+  createdAt        DateTime  @default(now())
+  guruId           String?
+  jam              String
+  updatedAt        DateTime  @updatedAt
+  riwayatAbsensi   Absensi[]
+  guru             Pengguna? @relation(fields: [guruId], references: [id], onDelete: SetNull)
+
+  @@index([guruId])
+  @@index([tanggalMasuk])
+}
+
+model Absensi {
+  id      String        @id @default(uuid())
+  tanggal DateTime      @default(now())
+  muridId String
+  guruId  String?
+  status  StatusAbsensi
+  guru    Pengguna?     @relation(fields: [guruId], references: [id], onDelete: SetNull)
+  murid   Murid         @relation(fields: [muridId], references: [id], onDelete: Cascade) // Murid tetap cascade agar jika murid dihapus, absensinya ikut terhapus
+
+  @@index([tanggal])
+  @@index([guruId])
+  @@index([muridId])
+  // Index unik satu absensi per murid per hari dibuat langsung di database
+  // karena Prisma tidak mendukung expression index:
+  //   CREATE UNIQUE INDEX absensi_murid_per_hari_unik
+  //     ON "Absensi" ("muridId", date_trunc('day', "tanggal"));
+  // Jangan dihapus; aturan 1 murid 1 hari ditegakkan di level DB.
+}
+
+model AbsensiGuru {
+  id          String    @id @default(uuid())
+  waktuMasuk  DateTime  @default(now())
+  waktuPulang DateTime? // Tambahkan kolom opsional ini
+  guruId      String
+  guru        Pengguna  @relation(fields: [guruId], references: [id], onDelete: Cascade)
+
+  @@index([waktuMasuk])
+}
+
+enum Peran {
+  ADMIN
+  GURU
+}
+
+enum StatusAbsensi {
+  HADIR
+  IZIN
+  SAKIT
+  ALPHA
+}
+
+enum Kelas {
+  CALISTUNG
+
+  SD_1
+  SD_2
+  SD_3
+  SD_4
+  SD_5
+  SD_6
+
+  SMP_1
+  SMP_2
+  SMP_3
+
+  SMK_1
+  SMK_2
+  SMK_3
+}
