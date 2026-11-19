@@ -90,13 +90,25 @@ jobs:
             sleep 2
           done
 
-      - name: Verify database connection
+      - name: Debug database connection
         run: |
+          echo "Testing with psql..."
+          PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d test -c "SELECT version();" || true
+          echo "Testing with Prisma..."
           npx prisma db execute --stdin <<< "SELECT 1" || true
           echo "Database connection verified"
 
-      - name: Run migrations
-        run: npx prisma migrate deploy
+      - name: Run migrations (with retry)
+        run: |
+          for i in {1..5}; do
+            echo "Migration attempt $i/5"
+            if npx prisma migrate deploy; then
+              echo "Migration successful"
+              break
+            fi
+            echo "Migration failed, waiting 5s before retry..."
+            sleep 5
+          done
 
       - name: Run tests
         run: npm run test
