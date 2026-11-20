@@ -1,4 +1,4 @@
-declare module 'jsonwebtoken' {
+declare module "jsonwebtoken" {
   export interface SignOptions {
     algorithm?: string;
     expiresIn?: string | number;
@@ -49,19 +49,23 @@ declare module 'jsonwebtoken' {
   export function sign(
     payload: string | Buffer | object,
     secretOrPrivateKey: string | Buffer,
-    options?: SignOptions
+    options?: SignOptions,
   ): string;
 
   export function verify(
     token: string,
     secretOrPublicKey: string | Buffer,
-    options?: VerifyOptions
+    options?: VerifyOptions,
   ): JwtPayload | string;
 
   export function decode(
     token: string,
-    options?: DecodeOptions
-  ): null | JwtPayload | string | { header: object; payload: JwtPayload; signature: string };
+    options?: DecodeOptions,
+  ):
+    | null
+    | JwtPayload
+    | string
+    | { header: object; payload: JwtPayload; signature: string };
 
   export class JsonWebTokenError extends Error {
     constructor(message: string, error?: Error);

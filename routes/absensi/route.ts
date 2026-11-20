@@ -45,37 +45,39 @@ export async function POST(req: Request) {
     // menyimpan absensi murid yang sama pada detik yang bersamaan.
     const kunciHari = `absensi:${data.muridId}:${awalHari.toISOString().slice(0, 10)}`;
 
-    const hasil = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${kunciHari}))`;
+    const hasil = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${kunciHari}))`;
 
-      const catatanHariIni = await tx.absensi.findFirst({
-        where: {
-          muridId: data.muridId,
-          tanggal: { gte: awalHari, lte: akhirHari },
-        },
-        orderBy: { tanggal: "desc" },
-        include: {
-          guru: { select: { nama: true } },
-        },
-      });
+        const catatanHariIni = await tx.absensi.findFirst({
+          where: {
+            muridId: data.muridId,
+            tanggal: { gte: awalHari, lte: akhirHari },
+          },
+          orderBy: { tanggal: "desc" },
+          include: {
+            guru: { select: { nama: true } },
+          },
+        });
 
-      if (catatanHariIni) {
-        return {
-          status: "konflik" as const,
-          pencatat: catatanHariIni.guru?.nama || null,
-        };
-      }
+        if (catatanHariIni) {
+          return {
+            status: "konflik" as const,
+            pencatat: catatanHariIni.guru?.nama || null,
+          };
+        }
 
-      const absensiBaru = await tx.absensi.create({
-        data: {
-          muridId: data.muridId,
-          guruId: payload.id, // ID pencatat didapat dengan aman dari token JWT internal backend
-          status: data.status,
-        },
-      });
+        const absensiBaru = await tx.absensi.create({
+          data: {
+            muridId: data.muridId,
+            guruId: payload.id, // ID pencatat didapat dengan aman dari token JWT internal backend
+            status: data.status,
+          },
+        });
 
-      return { status: "dibuat" as const, data: absensiBaru };
-    });
+        return { status: "dibuat" as const, data: absensiBaru };
+      },
+    );
 
     if (hasil.status === "konflik") {
       // Satu murid hanya satu absensi per hari dan pencatatnya mengunci baris ini.
