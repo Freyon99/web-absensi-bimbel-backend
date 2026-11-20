@@ -155,9 +155,9 @@ export async function POST(req: Request) {
 
     const kunciMuridLama = new Set(
       muridLama
-        .filter((item) => item.noHpOrangTua.trim() !== "")
+        .filter((item: typeof muridLama[0]) => item.noHpOrangTua.trim() !== "")
         .map(
-          (item) =>
+          (item: typeof muridLama[0]) =>
             `${normalisasiKunci(item.namaLengkap)}|${normalisasiKunci(item.noHpOrangTua)}`,
         ),
     );

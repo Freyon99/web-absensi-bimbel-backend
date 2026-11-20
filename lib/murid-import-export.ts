@@ -122,7 +122,7 @@ for (const kolom of KOLOM_MURID) {
 }
 
 const PETA_KELAS: Record<string, Kelas> = {};
-for (const kelas of Object.values(Kelas)) {
+for (const kelas of Object.values(Kelas) as Kelas[]) {
   PETA_KELAS[normalisasiKunci(kelas)] = kelas;
 }
 

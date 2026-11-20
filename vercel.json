@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run prisma:generate && npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["sin1"],
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NODE_VERSION": "22"
+  }
+}

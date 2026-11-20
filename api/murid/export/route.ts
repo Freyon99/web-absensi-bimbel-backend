@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 
       baris = [
         HEADER_EKSPOR,
-        ...semuaMurid.map((murid) => [
+        ...semuaMurid.map((murid: typeof semuaMurid[0]) => [
           murid.namaLengkap,
           murid.namaPanggilan,
           murid.kelas,

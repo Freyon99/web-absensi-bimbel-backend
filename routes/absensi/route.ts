@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     // menyimpan absensi murid yang sama pada detik yang bersamaan.
     const kunciHari = `absensi:${data.muridId}:${awalHari.toISOString().slice(0, 10)}`;
 
-    const hasil = await prisma.$transaction(async (tx) => {
+    const hasil = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${kunciHari}))`;
 
       const catatanHariIni = await tx.absensi.findFirst({
