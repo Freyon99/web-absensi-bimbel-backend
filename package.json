@@ -22,8 +22,7 @@
     "@opentelemetry/resources": "^3.1.1",
     "@opentelemetry/sdk-node": "^0.301.2",
     "@opentelemetry/semantic-conventions": "^1.45.0",
-    "@prisma/adapter-pg": "^7.10.1",
-    "@prisma/client": "^7.9.0",
+    "@prisma/client": "^7.10.1",
     "approve": "^0.0.12",
     "bcryptjs": "^3.0.3",
     "ioredis": "^5.11.1",
@@ -48,7 +47,7 @@
     "eslint-plugin-react": "^7.37.5",
     "glob": "^14.0.6",
     "prettier": "^3.10.1",
-    "prisma": "^6.12.0",
+    "prisma": "^7.10.1",
     "rimraf": "^6.1.4",
     "typescript": "^5",
     "vitest": "^5.1.1"
